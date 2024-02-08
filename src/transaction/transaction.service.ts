@@ -28,6 +28,7 @@ import handlers from 'handlebars';
 import path from 'path';
 import customerService from '../customer/customer.service';
 import htmlToPdf from 'html-pdf';
+import axios from 'axios';
 
 const templateDirectory = path.resolve(process.cwd(), 'templates');
 
@@ -113,6 +114,7 @@ const getTruckTransactions = async () => {
 };
 const getGroupedTruckTransactions = async (date: TransactionSummaryQuery) => {
   const transactions = await transactionRepository.getAllTransactions(date);
+  console.log('🚀 ~ getGroupedTruckTransactions ~ transactions:', transactions);
   const trucks = await truckRepository.getTrucks();
 
   for (const transaction of transactions) {
@@ -133,12 +135,14 @@ const getGroupedTruckTransactions = async (date: TransactionSummaryQuery) => {
     if (!summary[truckName]) {
       summary[truckName] = {
         truckId: transaction.truckId,
-        cost: transaction.transactionType == 'TRUCK_TRANSACTION'
-        ? transaction.cost
-        : 0,
-        additionalCost: transaction.transactionType == 'TRUCK_ADDITIONAL_TRANSACTION'
-        ? transaction.cost
-        : 0,
+        cost:
+          transaction.transactionType == 'TRUCK_TRANSACTION'
+            ? transaction.cost
+            : 0,
+        additionalCost:
+          transaction.transactionType == 'TRUCK_ADDITIONAL_TRANSACTION'
+            ? transaction.cost
+            : 0,
         sellingPrice: transaction.income
           ? transaction.income
           : transaction.sellingPrice,
@@ -215,7 +219,8 @@ const getTotalSummary = async (date: TransactionSummaryQuery) => {
       summary.totalAdditionalCost += transaction.cost;
     }
 
-    const incomeOrSellingPrice = transaction.income || transaction.sellingPrice || 0;
+    const incomeOrSellingPrice =
+      transaction.income || transaction.sellingPrice || 0;
     summary.totalMargin += incomeOrSellingPrice - transaction.cost;
   }
 
@@ -452,16 +457,24 @@ const printSummary = async ({ startDate, endDate }: DateQuery) => {
   handlers.registerHelper('formatDate', formatDate);
 
   const summary = await getGroupedTruckTransactions({ startDate, endDate });
+  await axios({
+    method: 'POST',
+    url: `https://trucking.requestcatcher.com/test`,
+    data: { summary: summary },
+  });
+
+  console.log('🚀 ~ printSummary ~ summary:', summary);
   const transactions = await transactionRepository.getTransactions({
     startDate,
     endDate,
   });
 
   const totalSellingPrice = Object.values(summary).reduce(
-    (acc, obj) => acc + (obj.income !== undefined ? obj.income : obj.sellingPrice || 0),
+    (acc, obj) =>
+      acc + (obj.income !== undefined ? obj.income : obj.sellingPrice || 0),
     0
   );
-  
+
   const totalTruckCost = Object.values(summary).reduce(
     (acc, obj) => acc + obj.cost,
     0
@@ -515,6 +528,21 @@ const printSummary = async ({ startDate, endDate }: DateQuery) => {
     miscTransactionsTotal,
     transactionsInPage,
   };
+  await axios({
+    method: 'POST',
+    url: `https://trucking.requestcatcher.com/test`,
+    data: { totalMargin: totalMargin },
+  });
+  await axios({
+    method: 'POST',
+    url: `https://trucking.requestcatcher.com/test`,
+    data: { totalSellingPrice: totalSellingPrice },
+  });
+  console.log('🚀 ~ printSummary ~ content.totalMargin:', content.totalMargin);
+  console.log(
+    '🚀 ~ printSummary ~ content.totalSellingPrice:',
+    content.totalSellingPrice
+  );
 
   const file = fs.readFileSync(
     path.join(templateDirectory, 'laporan.html'),

@@ -13,10 +13,8 @@ const run = async () => {
     .collection('customers')
     .find({})
     .toArray();
-  console.log(customers);
 
   for (customer of customers) {
-    console.log(customer);
     await db.connection.collection('transactions').updateMany(
       {
         customer: customer.initial,
