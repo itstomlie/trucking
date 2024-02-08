@@ -29,6 +29,7 @@ import path from 'path';
 import customerService from '../customer/customer.service';
 import htmlToPdf from 'html-pdf';
 import axios from 'axios';
+import _ from 'lodash';
 
 const templateDirectory = path.resolve(process.cwd(), 'templates');
 
@@ -463,8 +464,7 @@ const printSummary = async ({ startDate, endDate }: DateQuery) => {
   });
 
   const totalSellingPrice = Object.values(summary).reduce(
-    (acc, obj) =>
-      acc + (obj.income !== undefined ? obj.income : obj.sellingPrice || 0),
+    (acc, obj) => acc + _.get(obj, 'income', _.get(obj, 'sellingPrice', 0)),
     0
   );
 
