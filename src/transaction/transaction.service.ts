@@ -114,7 +114,6 @@ const getTruckTransactions = async () => {
 };
 const getGroupedTruckTransactions = async (date: TransactionSummaryQuery) => {
   const transactions = await transactionRepository.getAllTransactions(date);
-  console.log('🚀 ~ getGroupedTruckTransactions ~ transactions:', transactions);
   const trucks = await truckRepository.getTrucks();
 
   for (const transaction of transactions) {
@@ -457,13 +456,7 @@ const printSummary = async ({ startDate, endDate }: DateQuery) => {
   handlers.registerHelper('formatDate', formatDate);
 
   const summary = await getGroupedTruckTransactions({ startDate, endDate });
-  await axios({
-    method: 'POST',
-    url: `https://trucking.requestcatcher.com/test`,
-    data: { summary: summary },
-  });
 
-  console.log('🚀 ~ printSummary ~ summary:', summary);
   const transactions = await transactionRepository.getTransactions({
     startDate,
     endDate,
@@ -528,21 +521,6 @@ const printSummary = async ({ startDate, endDate }: DateQuery) => {
     miscTransactionsTotal,
     transactionsInPage,
   };
-  await axios({
-    method: 'POST',
-    url: `https://trucking.requestcatcher.com/test`,
-    data: { totalMargin: totalMargin },
-  });
-  await axios({
-    method: 'POST',
-    url: `https://trucking.requestcatcher.com/test`,
-    data: { totalSellingPrice: totalSellingPrice },
-  });
-  console.log('🚀 ~ printSummary ~ content.totalMargin:', content.totalMargin);
-  console.log(
-    '🚀 ~ printSummary ~ content.totalSellingPrice:',
-    content.totalSellingPrice
-  );
 
   const file = fs.readFileSync(
     path.join(templateDirectory, 'laporan.html'),
