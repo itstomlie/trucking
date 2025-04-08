@@ -7,6 +7,7 @@ module.exports = {
   images: {
     domains: ['cdn.pixabay.com', 'i.imgur.com'],
   },
+  staticPageGenerationTimeout: 1000,
   async headers() {
     return [
       {
