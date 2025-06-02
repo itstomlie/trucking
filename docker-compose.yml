@@ -1,7 +1,8 @@
 # docker-compose.yml
 version: '2'
 services:
-  app:
+  trucking-yang:
+    container_name: trucking-yang
     platform: linux/amd64
     build:
       context: .
@@ -12,17 +13,9 @@ services:
       - ./.env
     command: sh -c 'npm run start'
     restart: unless-stopped
-  letsencrypt:
-    image: linuxserver/letsencrypt
-    container_name: letsencrypt
-    ports:
-      - 443:443
-      - 80:80
-    volumes:
-      - ./config/letsencrypt:/config
-    environment:
-      - EMAIL=filberttt@hotmail.com
-      - URL=trucking.fildabert.com
-      - VALIDATION=http
-      - PUID=1000
-      - PGID=1000
+    networks:
+      - swag_network
+
+networks:
+  swag_network:
+    external: true
