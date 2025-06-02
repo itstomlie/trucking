@@ -1,7 +1,7 @@
 import { CookieValueTypes } from 'cookies-next';
 import { JwtPayload } from 'jsonwebtoken';
 
-export const BASE_URL = 'https://trucking-yang.itstomlie.my.id';
+export const BASE_URL = 'http://103.175.218.230:3000';
 // export const BASE_URL = 'http://localhost:3000';
 
 
