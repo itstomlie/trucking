@@ -8,7 +8,7 @@ import {
   User,
 } from '../types/common';
 import React, { useEffect, useState } from 'react';
-import { PrinterIcon } from '@heroicons/react/solid';
+import { PrinterIcon, CheckCircleIcon } from '@heroicons/react/solid';
 import truckTransactionBloc from '../lib/truckTransaction';
 import DeleteVariousTransactionButton from './delete-various-transaction-button';
 import { useToastContext } from '../lib/toast-context';
@@ -48,7 +48,7 @@ function buildTransactionRow(
       {Object.entries(tableTransaction).map(([key, val], i) => {
         let rowValue = val.toString();
         if (['sellingPrice', 'cost', 'income'].includes(key)) {
-          rowValue = val.toLocaleString().replace(/,/g, '.');
+          rowValue = Math.round(Number(val)).toLocaleString().replace(/,/g, '.');
         }
         return (
           <Table.Cell
@@ -143,6 +143,40 @@ export default function TruckTransactionDataTable({
     refreshData();
   }
 
+  async function toggleLunas() {
+    const selectedTransactions = truckTransactions.filter((t) => t.selected);
+    const markedTransactions = selectedTransactions.map((t) => t.id);
+
+    if (markedTransactions.length < 1) {
+      addToast('Mohon pilih transaksi');
+      return;
+    }
+
+    // smart toggle: if every selected row is already paid, unmark all; else mark all paid
+    const isLunas = !selectedTransactions.every((t) => t.isLunas);
+
+    addToast('Loading...');
+
+    const response = await truckTransactionBloc.markAsLunas(
+      markedTransactions,
+      isLunas
+    );
+
+    if (response === 'Success') {
+      addToast(isLunas ? 'Ditandai Lunas' : 'Batal Lunas');
+    } else {
+      addToast('Mohon coba kembali');
+    }
+
+    truckTransactions.forEach((trax) => {
+      if (trax.selected) {
+        trax.isLunas = isLunas;
+      }
+      trax.selected = false;
+    });
+    setTruckTransactions([...truckTransactions]);
+  }
+
   const totalCost = data.reduce((acc, obj) => acc + obj.cost, 0);
   const totalSell = data.reduce(
     (acc, obj) => acc + (obj.income ? obj.income : obj.sellingPrice),
@@ -156,7 +190,7 @@ export default function TruckTransactionDataTable({
   return (
     <>
       {emkl && user.role !== 'user' && (
-        <div className="flex justify-between">
+        <div className="flex justify-between sticky top-0 z-20 bg-white py-3 border-b border-gray-200">
           <div className="flex gap-3">
             <input
               className="mt-5 ml-6 rounded checked:bg-green-400 checked:border-green-400 focus:ring-green-500 cursor-pointer"
@@ -194,34 +228,13 @@ export default function TruckTransactionDataTable({
               value={invoiceNum}
               onChange={handleChange}
             />
-           <div className="dropdown">
-              <button
-                className={`dropbtn flex my-1 border border-gray-300 rounded shadow-sm px-2 text-gray-600 hover:bg-white`}
-              >
-                <PrinterIcon className="h-5 mt-1" />
-                <p className={`text-lg font-bold`}>Tagihan</p>
-              </button>
-              <div className="dropdown-content">
-                <a
-                  className="cursor-pointer"
-                  onClick={() => print('tagihanYang')}
-                >
-                  Yang
-                </a>
-                <a
-                  className="cursor-pointer"
-                  onClick={() => print('tagihanMery')}
-                >
-                  Mery
-                </a>
-                <a
-                  className="cursor-pointer"
-                  onClick={() => print('tagihanKasim')}
-                >
-                  Kasim Ratna
-                </a>
-              </div>
-            </div>
+            <button
+              className={`flex my-1 border border-gray-300 rounded shadow-sm px-2 text-gray-600 hover:bg-white`}
+              onClick={() => print('tagihan')}
+            >
+              <PrinterIcon className="h-5 mt-1" />
+              <p className={`text-lg font-bold`}>Tagihan</p>
+            </button>
 
             <button
               className={`flex my-1 border border-gray-300 rounded shadow-sm px-2 text-gray-600 hover:bg-white`}
@@ -230,6 +243,14 @@ export default function TruckTransactionDataTable({
               <PrinterIcon className="h-5 mt-1" />
               <p className={`text-lg font-bold`}>Bon</p>
             </button>
+
+            <button
+              className={`flex my-1 border border-gray-300 rounded shadow-sm px-2 text-gray-600 hover:bg-white`}
+              onClick={toggleLunas}
+            >
+              <CheckCircleIcon className="h-5 mt-1" />
+              <p className={`text-lg font-bold`}>Lunas</p>
+            </button>
           </div>
         </div>
       )}
@@ -237,7 +258,7 @@ export default function TruckTransactionDataTable({
       <Table>
         <Table.Head className="whitespace-nowrap">
           {emkl && user.role !== 'user' && (
-            <Table.HeadCell className="text-center">Print</Table.HeadCell>
+            <Table.HeadCell className="text-center">Status</Table.HeadCell>
           )}
           {emkl && <Table.HeadCell className="text-center">No</Table.HeadCell>}
 
@@ -299,6 +320,16 @@ export default function TruckTransactionDataTable({
                           }`}
                         >
                           <p className={`text-center font-bold`}>Tagihan</p>
+                        </div>
+
+                        <div
+                          className={`my-1 border border-gray-300 rounded px-2 ${
+                            truckTransactions[index]?.isLunas
+                              ? 'bg-green-400 text-gray-100'
+                              : 'text-gray-600'
+                          }`}
+                        >
+                          <p className={`text-center font-bold`}>Lunas</p>
                         </div>
                       </div>
                     </div>

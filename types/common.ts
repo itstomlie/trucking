@@ -53,6 +53,7 @@ export interface TruckTransaction extends Transaction {
   bon: string;
   isPrintedBon: boolean;
   isPrintedInvoice: boolean;
+  isLunas?: boolean;
 }
 
 export interface AdditionalTruckTransaction extends Transaction {

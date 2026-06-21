@@ -86,6 +86,7 @@ export default function CustomerDetails({
       truckId: truckTransaction.truckId,
       isPrintedBon: truckTransaction.isPrintedBon,
       isPrintedInvoice: truckTransaction.isPrintedInvoice,
+      isLunas: truckTransaction.isLunas,
       editableByUserUntil: truckTransaction.editableByUserUntil,
     };
   };
@@ -232,6 +233,7 @@ export default function CustomerDetails({
                 'truckId',
                 'isPrintedBon',
                 'isPrintedInvoice',
+                'isLunas',
                 'pph',
                 'sellingPrice',
                 'editableByUserUntil',
@@ -332,6 +334,7 @@ export default function CustomerDetails({
                 'truckId',
                 'isPrintedBon',
                 'isPrintedInvoice',
+                'isLunas',
                 'pph',
                 'sellingPrice',
                 'editableByUserUntil',
