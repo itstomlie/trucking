@@ -6,6 +6,7 @@ interface TextInputConfig {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   value?: string | number;
   type?: string;
+  allowDecimal?: boolean;
 }
 
 export default function TextInput({
@@ -16,20 +17,56 @@ export default function TextInput({
   onChange,
   value,
   type = 'text',
+  allowDecimal = false,
 }: TextInputConfig) {
-  const valueFormat = (inputValue: any) => {
-    if (type === 'currency') {
-      const str = inputValue.toString().replace(/[A-Za-z,\-\_\+\=]/g, '');
-      return Number(str).toLocaleString();
+  function sanitizeCurrencyInput(inputValue: string) {
+    const cleaned = inputValue.replace(/[^0-9.,]/g, '');
+
+    if (allowDecimal) {
+      const withoutCommas = cleaned.replace(/,/g, '');
+      const [intPart = '', ...rest] = withoutCommas.split('.');
+      const decimalPart = rest.join('');
+      const hasTrailingDot = withoutCommas.endsWith('.') && rest.length === 0;
+      return {
+        normalized: `${intPart}${rest.length ? `.${decimalPart}` : ''}`,
+        hasTrailingDot,
+      };
     }
-    return inputValue as string;
-  };
+
+    return {
+      normalized: cleaned.replace(/[^0-9]/g, ''),
+      hasTrailingDot: false,
+    };
+  }
+
+  function valueFormat(inputValue: string | number | undefined) {
+    if (type !== 'currency') {
+      return (inputValue ?? '') as string | number;
+    }
+
+    const raw =
+      inputValue === undefined || inputValue === null ? '' : String(inputValue);
+    const { normalized, hasTrailingDot } = sanitizeCurrencyInput(raw);
+
+    if (!normalized) return '';
+
+    if (!allowDecimal) {
+      return Number(normalized).toLocaleString('en-US');
+    }
+
+    const [intPart = '', decimalPart] = normalized.split('.');
+    const intFormatted = intPart
+      ? Number(intPart).toLocaleString('en-US')
+      : '0';
+
+    if (hasTrailingDot) return `${intFormatted}.`;
+    if (decimalPart !== undefined) return `${intFormatted}.${decimalPart}`;
+    return intFormatted;
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (type === 'currency') {
-      e.target.value = e.target.value
-        .toString()
-        .replace(/[A-Za-z,\-\_\+\=]/g, '');
+      e.target.value = sanitizeCurrencyInput(String(e.target.value)).normalized;
     }
     onChange(e);
   }
@@ -38,7 +75,7 @@ export default function TextInput({
     <>
       <div>
         <label
-          htmlFor="price"
+          htmlFor={name}
           className="block text-sm font-medium text-gray-700"
         >
           {label}
@@ -48,9 +85,11 @@ export default function TextInput({
             <span className="text-gray-500 sm:text-sm"> {prefix} </span>
           </div>
           <input
-            type={type}
+            type={type === 'currency' ? 'text' : type}
             name={name}
-            // id="price"
+            id={name}
+            inputMode={type === 'currency' ? 'decimal' : undefined}
+            pattern={type === 'currency' ? '[0-9]*[.,]?[0-9]*' : undefined}
             className={
               type == 'currency'
                 ? 'block w-full pl-8 pr-2 py-1 sm:text-sm border border-gray-300 rounded'

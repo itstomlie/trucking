@@ -313,6 +313,7 @@ export default function AddTruckTransactionButton({
                       label="PPH"
                       name="pph"
                       type="currency"
+                      allowDecimal
                       value={truckTransaction.pph}
                       prefix="%"
                       onChange={handleChange}
