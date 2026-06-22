@@ -136,11 +136,11 @@
               {{#if this.pph}}
                 <td class="tableHeadCol" style="white-space: nowrap"><div>{{formatRupiah this.sellingPrice}}</div></td>
                 <td class="tableHeadCol"><div>{{this.pph}}%</div></td>
-                <td class="tableHeadCol" style="display: flex; flex-direction: column;"><div style="white-space: nowrap;">{{formatRupiah this.income}}</div><p style="font-size: 6px;">{{this.details}}</p></td>
+                <td class="tableHeadCol" style="white-space: nowrap"><div>{{formatRupiah this.income}}</div></td>
               {{else}}
                 <td class="tableHeadCol" style="white-space: nowrap"><div>{{formatRupiah this.sellingPrice}}</div></td>
                 <td class="tableHeadCol"><div>0%</div></td>
-                <td class="tableHeadCol" style="display: flex; flex-direction: column;"><div style="white-space: nowrap;">{{formatRupiah this.sellingPrice}}</div><p style="font-size: 6px;">{{this.details}}</p></td>
+                <td class="tableHeadCol" style="white-space: nowrap"><div>{{formatRupiah this.sellingPrice}}</div></td>
               {{/if}}
             {{else}}
             <td class="tableBodyCol" style="white-space: nowrap"><div>{{formatRupiah this.sellingPrice}}</div></td>
