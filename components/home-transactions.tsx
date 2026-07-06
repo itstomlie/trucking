@@ -33,7 +33,7 @@ function buildTransactionRow(
         let rowValue = val;
 
         if (['sellingPrice', 'cost', 'income'].includes(key)) {
-          rowValue = val.toLocaleString().replace(/,/g, '.');
+          rowValue = Math.round(Number(val)).toLocaleString().replace(/,/g, '.');
         }
 
         if ('customer'.includes(key)) {

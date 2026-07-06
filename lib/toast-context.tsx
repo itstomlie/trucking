@@ -19,7 +19,7 @@ export function ToastContextProvider({ children }: { children: JSX.Element }) {
   return (
     <ToastContext.Provider value={addToast}>
       {children}
-      <div className="absolute top-0 right-0 p-5" style={{ zIndex: 50 }}>
+      <div className="fixed bottom-0 right-0 p-5" style={{ zIndex: 50 }}>
         <div className="grid gap-2 grid-cols-1"></div>
         {toasts.map((toast, i) => (
           <MyToast key={i} message={toast} />

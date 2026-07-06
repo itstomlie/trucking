@@ -236,6 +236,17 @@ const updatePrintStatus = async (transactionIds: string[], type: string) => {
   return response;
 };
 
+const updateLunasStatus = async (
+  transactionIds: string[],
+  isLunas: boolean
+) => {
+  const response = await TransactionModel.updateMany(
+    { _id: { $in: transactionIds } },
+    { isLunas }
+  );
+  return response;
+};
+
 const transactionRepository = {
   createAdditionalTruckTransaction,
   getTruckTransactions,
@@ -254,6 +265,7 @@ const transactionRepository = {
   createTransaction,
   editTransaction,
   updatePrintStatus,
+  updateLunasStatus,
 };
 
 export default transactionRepository;

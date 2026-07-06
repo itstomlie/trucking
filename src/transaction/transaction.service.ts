@@ -419,16 +419,8 @@ const printTransaction = async (
     havePPH,
   };
 
-  if (type == 'tagihanKasim') {
-    content.main.noRek = '1951016581';
-    content.main.atasNama = 'KASIM RATNA';
-  } else if (type == 'tagihanMery') {
-    content.main.noRek = '2421210537';
-    content.main.atasNama = 'MERY';
-  } else {
-    content.main.noRek = '8195314663';
-    content.main.atasNama = 'Ali Martono';
-  }
+  content.main.noRek = '8195314663';
+  content.main.atasNama = 'Ali Martono';
 
   let file;
   if (type === 'bon') {
@@ -544,6 +536,13 @@ const updatePrintStatus = async (transactionIds: string[], type: string) => {
   transactionRepository.updatePrintStatus(transactionIds, type);
 };
 
+const updateLunasStatus = async (
+  transactionIds: string[],
+  isLunas: boolean
+) => {
+  return transactionRepository.updateLunasStatus(transactionIds, isLunas);
+};
+
 const transactionService = {
   createTruckTransaction,
   createAdditionalTruckTransaction,
@@ -564,6 +563,7 @@ const transactionService = {
   editTransaction,
   printSummary,
   updatePrintStatus,
+  updateLunasStatus,
 };
 
 export default transactionService;

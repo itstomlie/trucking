@@ -66,6 +66,9 @@ const transactionSchema = new Schema<any>(
     isPrintedInvoice: {
       type: Boolean,
     },
+    isLunas: {
+      type: Boolean,
+    },
     editableByUserUntil:{
       type: Date
     }

@@ -223,6 +223,20 @@ const printSummary = async ({ startDate, endDate }: DateQuery) => {
   return 'Print Failed';
 };
 
+const markAsLunas = async (transactionIds: string[], isLunas: boolean) => {
+  const response = await axios({
+    method: 'POST',
+    url: `${BASE_URL}/api/transaction/lunas`,
+    data: {
+      transactionIds,
+      isLunas,
+    },
+  });
+
+  if (response) return 'Success';
+  return 'Failed';
+};
+
 const truckTransactionBloc = {
   getTruckTransactions,
   getGroupedTruckTransactions,
@@ -233,6 +247,7 @@ const truckTransactionBloc = {
   getTruckTransactionAutoComplete,
   printTransactions,
   printSummary,
+  markAsLunas,
 };
 
 export default truckTransactionBloc;
