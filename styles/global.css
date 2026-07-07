@@ -92,6 +92,10 @@
   background: #31c48d;
 }
 
+.react-datepicker-popper {
+  z-index: 40 !important;
+}
+
 .react-datepicker__navigation {
   top: 1em;
   line-height: 1.7em;

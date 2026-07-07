@@ -38,7 +38,7 @@ const getGroupedTruckTransactions = async ({
     },
   });
   if (response && response.data) {
-    return response.data.data;
+    return response.data.data ?? {};
   }
   return {};
 };
@@ -62,7 +62,7 @@ const getTotalSummary = async ({
     },
   });
   if (response && response.data) {
-    return response.data.data;
+    return response.data.data ?? {};
   }
 
   return {};
